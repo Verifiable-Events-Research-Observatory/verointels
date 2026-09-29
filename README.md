@@ -1,33 +1,18 @@
-# VERO — Verifiable Events & Research Observatory
+# VERO Core Application
 
-<p align="center">
-  <img src="./public/assets/VERO.png" alt="VERO Logo" width="120" style="border-radius: 50%;">
-</p>
+The open-source repository for the Verifiable Events & Research Observatory. This codebase handles the client interface, secure API routing, and database integrations for the platform's live intelligence feed.
 
-**VERO (Verifiable Events & Research Observatory)** is an open-source, real-time intelligence monitoring platform designed to track global geopolitical developments, diplomatic shifts, and international affairs with a clean, policy-focused interface.
+## Tech Stack
+- **Client:** HTML5, CSS3, Vanilla JavaScript
+- **Server:** Node.js, Express.js
+- **Database:** MongoDB Atlas
+- **Integrations:** Live Data APIs
 
----
+## Local Deployment
+1. Clone the repository.
+2. Install dependencies: `npm install`
+3. Configure your `.env` file with `PORT`, `GNEWS_API_KEY`, and `MONGODB_URI`.
+4. Initialize the environment: `node server.js`
 
-## 🌟 Features
-
-- **Live Intelligence Feed:** Real-time updates on global affairs powered by GNews API.
-- **Categorized Intelligence:** Filter briefings by *Diplomacy*, *Military*, and *Economy*.
-- **Interactive Search:** Dynamic search bar to monitor specific nations, conflicts, or sanctions.
-- **Encrypted Transmission Channel:** Direct contact interface for data access requests and briefings.
-- **24/7 Operational Uptime:** Lightweight Node.js/Express backend integrated with keep-alive monitoring.
-
--
-
----
-
-### Prerequisites
-- Node.js installed on your local machine
-- A GNews API key (Free tier)
-- MongoDB Connection String
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Verifiable-Events-Research-Observatory/verointels.git
-   cd verointels
+## Organization
+Maintained by the [Verifiable Events Research Observatory](https://github.com/Verifiable-Events-Research-Observatory).
