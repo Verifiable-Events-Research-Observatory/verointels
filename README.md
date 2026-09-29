@@ -31,4 +31,3 @@
    ```bash
    git clone https://github.com/Verifiable-Events-Research-Observatory/verointels.git
    cd verointels
-```
