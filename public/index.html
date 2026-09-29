@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERO | Global Intelligence Briefing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <span class="ticker-item"><span class="pulse-dot"></span> URGENT: Security Council convenes over maritime
+                rights in Geneva.</span>
+            <span class="ticker-item"><span class="pulse-dot"></span> MARKET ALERT: Energy supply indexes fluctuate amid
+                sanctions policy review.</span>
+            <span class="ticker-item"><span class="pulse-dot"></span> DIPLOMACY: Bilateral summit yields progress on
+                regional border frameworks.</span>
+            <span class="ticker-item"><span class="pulse-dot"></span> URGENT: Security Council convenes over maritime
+                rights in Geneva.</span>
+        </div>
+    </div>
+
+    <nav class="nav-container" id="navbar">
+        <a href="#" class="brand">
+            <img src="./assets/VERO.png" alt="VERO Logo" class="brand-logo">
+            <span>VERO</span>
+        </a>
+        <div class="nav-links">
+            <a href="#intelligence">Intelligence</a>
+            <a href="#archives">Archives</a>
+            <a href="#contact" class="btn-nav">Contact Us</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge-international">
+                <i class="ph ph-shield-check"></i> UN-Standard Intelligence Feed
+            </div>
+            <h1>Global Operations & Policy Briefing</h1>
+            <p>Monitor international affairs, sanctions, economic shifts, and diplomatic relations in real-time without
+                the noise. Pure data, globally sourced.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="controls-section" id="intelligence">
+            <div class="search-bar">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Search for nations, conflicts, or policies...">
+            </div>
+            <div class="filters" id="filterContainer">
+                <button class="filter-btn active" data-filter="all">Global Overview</button>
+                <button class="filter-btn" data-filter="diplomacy">Diplomacy</button>
+                <button class="filter-btn" data-filter="military">Military</button>
+                <button class="filter-btn" data-filter="economy">Economy</button>
+            </div>
+        </section>
+
+        <section class="archives-header" id="archives">
+            <h2>Intelligence Archives & Live Feed</h2>
+            <p>Click on any intelligence card to read the full operational report at source.</p>
+        </section>
+
+        <section class="grid-container" id="newsGrid">
+        </section>
+
+        <section class="contact-section" id="contact">
+            <div class="contact-card">
+                <div class="contact-info">
+                    <h2>Establish Secure Channel</h2>
+                    <p>Request data access, report anomalies, or contact our operations team directly.</p>
+                    <div class="contact-details">
+                        <span><i class="ph ph-envelope-simple"></i> veropol@proton.me</span>
+                        <span><i class="ph ph-map-pin"></i> Damascus, Syria</span>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm">
+                    <div class="input-group">
+                        <input type="text" id="name" required placeholder=" ">
+                        <label for="name">Full Name / Callsign</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="email" required placeholder=" ">
+                        <label for="email">Secure Email</label>
+                    </div>
+                    <div class="input-group">
+                        <select id="topic" required>
+                            <option value="" disabled selected>Select Transmission Topic</option>
+                            <option value="data">Data Access Request</option>
+                            <option value="report">Intelligence Report</option>
+                            <option value="press">Press & Media</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <textarea id="message" rows="4" required placeholder=" "></textarea>
+                        <label for="message">Transmission Body</label>
+                    </div>
+                    <button type="submit" class="btn-submit">Transmit Encrypted <i
+                            class="ph ph-paper-plane-right"></i></button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="./assets/VERO.png" alt="VERO Logo" class="brand-logo">
+                <span>VERO</span>
+                <p>Independent global intelligence and diplomatic monitoring.</p>
+            </div>
+            <div class="footer-links">
+                <span>Privacy Policy</span>
+                <span>Terms of Service</span>
+                <span>System Status: <span class="status-green">Operational</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./javascript/script.js"></script>
+</body>
+
+</html>
