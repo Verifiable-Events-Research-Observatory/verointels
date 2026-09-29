@@ -29,5 +29,6 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Verifiable-Events-Research-Observatory/verointels.git](https://github.com/Verifiable-Events-Research-Observatory/verointels.git)
+   git clone https://github.com/Verifiable-Events-Research-Observatory/verointels.git
    cd verointels
+```
