@@ -85,6 +85,7 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
+// BURASI DÜZELTİLDİ: Express'in çökmesine neden olan '*' yerine regex kullanıldı.
 app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(__dirname, '../index.html'));
 });
