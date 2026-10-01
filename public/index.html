@@ -15,7 +15,6 @@
 </head>
 
 <body>
-
     <nav class="nav-container" id="navbar">
         <a href="#" class="brand">
             <img src="./assets/VERO.png" alt="VERO Logo" class="brand-logo" onerror="this.style.display='none'">
@@ -33,136 +32,206 @@
 
     <header class="hero">
         <div class="hero-content">
+            <div class="greeting-header" id="greetingHeader">
+                <h2>Good Morning, Strategist.</h2>
+            </div>
             <div class="badge-international">
                 <i class="ph ph-shield-check"></i> UN-Standard Intelligence Feed
             </div>
             <p class="hero-slogan" id="heroSlogan">Unfiltered Global Signals. Zero Noise.</p>
             <h1>Global Operations & Policy Briefing</h1>
-            <p>Monitor international affairs, sanctions, economic shifts, and diplomatic relations in real-time without
-                the noise. Pure data, globally sourced.</p>
 
-            <div class="hero-banner-frame">
-                <img src="./assets/BANNER.png" alt="VERO Global Intelligence Banner" class="hero-banner-img"
-                    onerror="this.parentElement.style.display='none'">
+            <div class="search-hero-container">
+                <div class="search-bar massive">
+                    <i class="ph ph-magnifying-glass search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Initialize global scan..." aria-label="Search">
+                    <button class="search-pulse-btn" id="searchTrigger"><i class="ph ph-radar"></i></button>
+                </div>
+                <div class="search-suggestions" id="searchSuggestions">
+                </div>
             </div>
         </div>
     </header>
 
     <main class="container">
-        <!-- Live Strategic Analytics & Conflict Theaters (BIGASS Events) -->
         <section class="theaters-section" id="theaters">
             <div class="section-title">
                 <h2><i class="ph ph-globe-hemisphere-west"></i> Active Conflict Theaters & Strategic Analysis</h2>
                 <p>Real-time situation maps, theater breakdowns, and dynamic operational monitoring.</p>
             </div>
 
-            <div class="theaters-grid">
-                <!-- Russo-Ukrainian War -->
+            <div class="theaters-grid grid-layout-6" id="theatersGrid">
+
                 <div class="theater-card">
-                    <div class="theater-header">
+                    <div class="theater-cover"
+                        style="background-image: url('https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&w=600&q=80');">
                         <div class="theater-badge danger"><i class="ph ph-warning-diamond"></i> Active War Zone</div>
+                    </div>
+                    <div class="theater-info">
                         <h3>Russo-Ukrainian Conflict</h3>
-                    </div>
-                    <p class="theater-desc">Frontline monitoring, territory changes, and tactical air/artillery
-                        activity.</p>
-                    <div class="map-container">
-                        <iframe src="https://liveuamap.com/" title="Russia-Ukraine War Live Map"
-                            loading="lazy"></iframe>
-                    </div>
-                    <div class="theater-actions">
-                        <button class="btn-theater-action" onclick="quickFetch('Ukraine war Russia conflict')">
-                            <i class="ph ph-arrows-clockwise"></i> Live Updates
-                        </button>
-                        <a href="https://liveuamap.com/" target="_blank" rel="noopener noreferrer" class="theater-link">
-                            Expand Full Map <i class="ph ph-arrow-square-out"></i>
-                        </a>
+                        <p class="theater-desc">Frontline monitoring, territory changes, and tactical air/artillery
+                            activity.</p>
+                        <div class="theater-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Artillery Posture</span>
+                                <span class="stat-val alert">Heavy</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Air Defense</span>
+                                <span class="stat-val">Active</span>
+                            </div>
+                        </div>
+                        <div class="theater-actions">
+                            <button class="btn-theater-action" onclick="quickFetch('Ukraine war Russia conflict')">
+                                <i class="ph ph-arrows-clockwise"></i> Load Intelligence
+                            </button>
+                            <a href="https://liveuamap.com/" target="_blank" rel="noopener noreferrer"
+                                class="theater-link">
+                                Live Map <i class="ph ph-arrow-square-out"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- US-Israel vs Lebanon-Iran & Proxies -->
                 <div class="theater-card">
-                    <div class="theater-header">
-                        <div class="theater-badge danger"><i class="ph ph-crosshair"></i> High Escalation Index</div>
-                        <h3>Middle East Conflict Theater</h3>
+                    <div class="theater-cover"
+                        style="background-image: url('https://images.unsplash.com/photo-1541888079633-97992705e4fc?auto=format&fit=crop&w=600&q=80');">
+                        <div class="theater-badge danger"><i class="ph crosshair"></i> Escalation Index</div>
                     </div>
-                    <p class="theater-desc">US-Israeli military stance, Lebanese front, Iranian proxy strikes, and Red
-                        Sea naval security.</p>
-                    <div class="theater-stats">
-                        <div class="stat-box">
-                            <span class="stat-label">Air Interceptions</span>
-                            <span class="stat-val alert">Active</span>
+                    <div class="theater-info">
+                        <h3>Middle East Conflict</h3>
+                        <p class="theater-desc">US-Israeli military stance, Lebanese front, Iranian proxy strikes, and
+                            naval security.</p>
+                        <div class="theater-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Interceptions</span>
+                                <span class="stat-val alert">Active</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Naval Posture</span>
+                                <span class="stat-val">CSG Deployed</span>
+                            </div>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-label">Naval Posture</span>
-                            <span class="stat-val">CSG Deployed</span>
+                        <div class="theater-actions">
+                            <button class="btn-theater-action" onclick="quickFetch('Israel Lebanon Iran Middle East')">
+                                <i class="ph ph-arrows-clockwise"></i> Load Intelligence
+                            </button>
                         </div>
-                    </div>
-                    <div class="theater-actions">
-                        <button class="btn-theater-action" onclick="quickFetch('Israel Lebanon Iran Middle East')">
-                            <i class="ph ph-arrows-clockwise"></i> Load Intelligence
-                        </button>
                     </div>
                 </div>
 
-                <!-- China-Taiwan-US Strait Posture -->
                 <div class="theater-card">
-                    <div class="theater-header">
+                    <div class="theater-cover"
+                        style="background-image: url('https://images.unsplash.com/photo-1584936683804-032997191395?auto=format&fit=crop&w=600&q=80');">
                         <div class="theater-badge warning"><i class="ph ph-eye"></i> Indo-Pacific Watch</div>
-                        <h3>China - Taiwan Strait Posture</h3>
                     </div>
-                    <p class="theater-desc">PLA naval encirclement exercises, ADIZ incursions, and US-Pacific fleet
-                        deterrence shifts.</p>
-                    <div class="theater-stats">
-                        <div class="stat-box">
-                            <span class="stat-label">ADIZ Incursions</span>
-                            <span class="stat-val">Elevated</span>
+                    <div class="theater-info">
+                        <h3>China - Taiwan Strait</h3>
+                        <p class="theater-desc">PLA naval encirclement exercises, ADIZ incursions, and US deterrence
+                            shifts.</p>
+                        <div class="theater-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">ADIZ Incursions</span>
+                                <span class="stat-val warning">Elevated</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Chokepoint</span>
+                                <span class="stat-val">Monitored</span>
+                            </div>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-label">Chokepoint Security</span>
-                            <span class="stat-val">Monitored</span>
+                        <div class="theater-actions">
+                            <button class="btn-theater-action" onclick="quickFetch('China Taiwan US military')">
+                                <i class="ph ph-arrows-clockwise"></i> Load Intelligence
+                            </button>
                         </div>
-                    </div>
-                    <div class="theater-actions">
-                        <button class="btn-theater-action" onclick="quickFetch('China Taiwan US military')">
-                            <i class="ph ph-arrows-clockwise"></i> Load Intelligence
-                        </button>
                     </div>
                 </div>
 
-                <!-- BRICS & Global Economic Realignment -->
                 <div class="theater-card">
-                    <div class="theater-header">
+                    <div class="theater-cover"
+                        style="background-image: url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=600&q=80');">
                         <div class="theater-badge info"><i class="ph ph-currency-dollar-simple"></i> Geo-Economics</div>
-                        <h3>BRICS & Multipolar Realignment</h3>
                     </div>
-                    <p class="theater-desc">De-dollarization initiatives, alternative payment routing, sanctions bypass,
-                        and resource corridors.</p>
-                    <div class="theater-stats">
-                        <div class="stat-box">
-                            <span class="stat-label">Trade Currency</span>
-                            <span class="stat-val">Local Pivot</span>
+                    <div class="theater-info">
+                        <h3>BRICS & Multipolarity</h3>
+                        <p class="theater-desc">De-dollarization initiatives, alternative payment routing, and resource
+                            corridors.</p>
+                        <div class="theater-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Trade Currency</span>
+                                <span class="stat-val">Local Pivot</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Sanctions</span>
+                                <span class="stat-val">Systemic</span>
+                            </div>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-label">Sanctions Impact</span>
-                            <span class="stat-val">Systemic</span>
+                        <div class="theater-actions">
+                            <button class="btn-theater-action" onclick="quickFetch('BRICS economy sanctions trade')">
+                                <i class="ph ph-arrows-clockwise"></i> Load Intelligence
+                            </button>
                         </div>
-                    </div>
-                    <div class="theater-actions">
-                        <button class="btn-theater-action" onclick="quickFetch('BRICS economy sanctions trade')">
-                            <i class="ph ph-arrows-clockwise"></i> Load Intelligence
-                        </button>
                     </div>
                 </div>
+
+                <div class="theater-card">
+                    <div class="theater-cover"
+                        style="background-image: url('https://images.unsplash.com/photo-1538356391444-2453c15382bc?auto=format&fit=crop&w=600&q=80');">
+                        <div class="theater-badge warning"><i class="ph ph-warning"></i> East Asia Watch</div>
+                    </div>
+                    <div class="theater-info">
+                        <h3>Korean Peninsula</h3>
+                        <p class="theater-desc">Ballistic missile tests, demilitarized zone tensions, and trilateral
+                            defense pacts.</p>
+                        <div class="theater-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Missile Tests</span>
+                                <span class="stat-val alert">Frequent</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Border Status</span>
+                                <span class="stat-val">Tense</span>
+                            </div>
+                        </div>
+                        <div class="theater-actions">
+                            <button class="btn-theater-action" onclick="quickFetch('North Korea South Korea military')">
+                                <i class="ph ph-arrows-clockwise"></i> Load Intelligence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theater-card">
+                    <div class="theater-cover"
+                        style="background-image: url('https://images.unsplash.com/photo-1628526189914-722a613bf7b1?auto=format&fit=crop&w=600&q=80');">
+                        <div class="theater-badge danger"><i class="ph ph-fire"></i> High Instability</div>
+                    </div>
+                    <div class="theater-info">
+                        <h3>Sahel Region Crisis</h3>
+                        <p class="theater-desc">Military juntas, insurgent expansions, and shifts in foreign military
+                            influence.</p>
+                        <div class="theater-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Regime Status</span>
+                                <span class="stat-val alert">Transitional</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Insurgency</span>
+                                <span class="stat-val">Expanding</span>
+                            </div>
+                        </div>
+                        <div class="theater-actions">
+                            <button class="btn-theater-action" onclick="quickFetch('Sahel Africa military coup')">
+                                <i class="ph ph-arrows-clockwise"></i> Load Intelligence
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
-        <!-- Search Controls -->
         <section class="controls-section" id="intelligence">
-            <div class="search-bar">
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Search nations, conflicts, policies..."
-                    aria-label="Search">
-            </div>
             <div class="filters" id="filterContainer">
                 <button class="filter-btn active" data-filter="all">Global Overview</button>
                 <button class="filter-btn" data-filter="diplomacy">Diplomacy</button>
@@ -176,10 +245,8 @@
             <p>Click on any intelligence card to access verified reporting at source.</p>
         </section>
 
-        <section class="grid-container" id="newsGrid">
-        </section>
+        <section class="grid-container" id="newsGrid"></section>
 
-        <!-- Contact Channel -->
         <section class="contact-section" id="contact">
             <div class="contact-card">
                 <div class="contact-info">
@@ -259,7 +326,6 @@
         </div>
     </footer>
 
-    <!-- Modals -->
     <div class="modal-overlay" id="modalPrivacy">
         <div class="modal-card">
             <div class="modal-header">
