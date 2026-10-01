@@ -118,21 +118,21 @@ const filterBtns = document.querySelectorAll('.filter-btn');
 let currentNewsData = [];
 
 const topicImageFallbacks = {
-    Military: 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&w=800&q=80',
-    Economy: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80',
-    Diplomacy: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80',
-    GlobalIntel: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80'
+    Military: 'https://images.unsplash.com/photo-1518281361980-b26bfd556770?auto=format&fit=crop&w=800&q=80',
+    Economy: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
+    Diplomacy: 'https://images.unsplash.com/photo-1523995462485-3d171b5c8fa9?auto=format&fit=crop&w=800&q=80',
+    GlobalIntel: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=800&q=80'
 };
 
 function analyzeContentTag(title, desc) {
     const content = (title + ' ' + (desc || '')).toLowerCase();
-    if (content.match(/war|military|defense|troops|weapon|missile|navy|army|conflict|strike|fighter|artillery|drone|escalation/)) {
+    if (content.match(/war|military|defense|troops|weapon|missile|navy|army|conflict|strike|fighter|artillery|drone|escalation|nuclear|pentagon|nato|pla|rebel|junta|combat|tactical/)) {
         return { name: 'Military', icon: 'ph-crosshair', fallback: topicImageFallbacks.Military };
     }
-    if (content.match(/economy|market|bank|trade|inflation|sanction|currency|brics|stocks|tariff|financial|oil/)) {
+    if (content.match(/economy|market|bank|trade|inflation|sanction|currency|brics|stocks|tariff|financial|oil|gas|export|import|gdp|invest/)) {
         return { name: 'Economy', icon: 'ph-chart-line-up', fallback: topicImageFallbacks.Economy };
     }
-    if (content.match(/president|minister|diplomat|summit|embassy|treaty|un|council|policy|envoy|talks|pact/)) {
+    if (content.match(/president|minister|diplomat|summit|embassy|treaty|un|council|policy|envoy|talks|pact|diplomacy|ambassador|geopolitics|alliance/)) {
         return { name: 'Diplomacy', icon: 'ph-handshake', fallback: topicImageFallbacks.Diplomacy };
     }
     return { name: 'Global Intel', icon: 'ph-globe', fallback: topicImageFallbacks.GlobalIntel };
@@ -158,7 +158,9 @@ function renderCards(data) {
         const formattedDate = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
 
         let coverImg = item.image;
-        if (!coverImg || coverImg.includes('generic') || coverImg.includes('business') || coverImg.includes('placeholder')) {
+        const invalidImg = !coverImg || ['generic', 'business', 'placeholder', 'logo', 'avatar', 'default', 'icon', 'stock'].some(kw => coverImg.toLowerCase().includes(kw));
+
+        if (invalidImg) {
             coverImg = tagData.fallback;
         }
 
