@@ -1,6 +1,6 @@
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 80) {
+    if (window.scrollY > 60) {
         navbar.classList.add('scrolled');
     } else {
         navbar.classList.remove('scrolled');
@@ -140,6 +140,25 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
         btn.innerHTML = originalText;
         btn.style.background = '';
     }, 3000);
+});
+
+// Modal Controller Logic
+const openPrivacy = document.getElementById('openPrivacy');
+const openTerms = document.getElementById('openTerms');
+const modalPrivacy = document.getElementById('modalPrivacy');
+const modalTerms = document.getElementById('modalTerms');
+const closePrivacy = document.getElementById('closePrivacy');
+const closeTerms = document.getElementById('closeTerms');
+
+openPrivacy.addEventListener('click', () => modalPrivacy.classList.add('active'));
+openTerms.addEventListener('click', () => modalTerms.classList.add('active'));
+
+closePrivacy.addEventListener('click', () => modalPrivacy.classList.remove('active'));
+closeTerms.addEventListener('click', () => modalTerms.classList.remove('active'));
+
+window.addEventListener('click', (e) => {
+    if (e.target === modalPrivacy) modalPrivacy.classList.remove('active');
+    if (e.target === modalTerms) modalTerms.classList.remove('active');
 });
 
 fetchLiveNews('geopolitics', 'all');
