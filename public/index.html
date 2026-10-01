@@ -16,19 +16,6 @@
 
 <body>
 
-    <div class="ticker-wrap">
-        <div class="ticker">
-            <span class="ticker-item"><span class="pulse-dot"></span> URGENT: Security Council convenes over maritime
-                rights in Geneva.</span>
-            <span class="ticker-item"><span class="pulse-dot"></span> MARKET ALERT: Energy supply indexes fluctuate amid
-                sanctions policy review.</span>
-            <span class="ticker-item"><span class="pulse-dot"></span> DIPLOMACY: Bilateral summit yields progress on
-                regional border frameworks.</span>
-            <span class="ticker-item"><span class="pulse-dot"></span> URGENT: Security Council convenes over maritime
-                rights in Geneva.</span>
-        </div>
-    </div>
-
     <nav class="nav-container" id="navbar">
         <a href="#" class="brand">
             <img src="./assets/VERO.png" alt="VERO Logo" class="brand-logo">
@@ -49,6 +36,10 @@
             <h1>Global Operations & Policy Briefing</h1>
             <p>Monitor international affairs, sanctions, economic shifts, and diplomatic relations in real-time without
                 the noise. Pure data, globally sourced.</p>
+
+            <div class="hero-banner-frame">
+                <img src="./assets/BANNER.png" alt="VERO Global Intelligence Banner" class="hero-banner-img">
+            </div>
         </div>
     </header>
 
@@ -80,8 +71,36 @@
                     <h2>Establish Secure Channel</h2>
                     <p>Request data access, report anomalies, or contact our operations team directly.</p>
                     <div class="contact-details">
-                        <span><i class="ph ph-envelope-simple"></i> veropol@proton.me</span>
-                        <span><i class="ph ph-map-pin"></i> Damascus, Syria</span>
+                        <a href="mailto:veropol@proton.me" class="contact-item">
+                            <i class="ph ph-envelope-simple"></i>
+                            <div>
+                                <strong>Secure Email</strong>
+                                <span>veropol@proton.me</span>
+                            </div>
+                        </a>
+                        <a href="https://github.com/verointels" target="_blank" rel="noopener noreferrer"
+                            class="contact-item">
+                            <i class="ph ph-github-logo"></i>
+                            <div>
+                                <strong>Organization Repository</strong>
+                                <span>github.com/verointels</span>
+                            </div>
+                        </a>
+                        <a href="https://github.com/leclavier" target="_blank" rel="noopener noreferrer"
+                            class="contact-item">
+                            <i class="ph ph-code-simple"></i>
+                            <div>
+                                <strong>Lead Developer</strong>
+                                <span>github.com/leclavier</span>
+                            </div>
+                        </a>
+                        <div class="contact-item">
+                            <i class="ph ph-lock-key"></i>
+                            <div>
+                                <strong>Transmission Protocol</strong>
+                                <span>End-to-End Encrypted Routing</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <form class="contact-form" id="contactForm">
@@ -115,17 +134,53 @@
     <footer>
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="./assets/VERO.png" alt="VERO Logo" class="brand-logo">
-                <span>VERO</span>
-                <p>Independent global intelligence and diplomatic monitoring.</p>
+                <div class="brand-line">
+                    <img src="./assets/VERO.png" alt="VERO Logo" class="brand-logo">
+                    <span>VERO</span>
+                </div>
+                <p>Independent global intelligence and diplomatic monitoring observatory.</p>
             </div>
             <div class="footer-links">
-                <span>Privacy Policy</span>
-                <span>Terms of Service</span>
-                <span>System Status: <span class="status-green">Operational</span></span>
+                <button type="button" class="footer-link-btn" id="openPrivacy">Privacy Policy</button>
+                <button type="button" class="footer-link-btn" id="openTerms">Terms of Service</button>
+                <a href="https://github.com/verointels" target="_blank" rel="noopener noreferrer"
+                    class="footer-social-link"><i class="ph ph-github-logo"></i> VERO</a>
+                <a href="https://github.com/leclavier" target="_blank" rel="noopener noreferrer"
+                    class="footer-social-link"><i class="ph ph-user"></i> Maintainer</a>
             </div>
         </div>
     </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modalPrivacy">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="ph ph-shield-check"></i> Privacy Policy</h3>
+                <button class="modal-close" id="closePrivacy">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Zero Tracking Guarantee:</strong> VERO operates under a strict privacy-first architecture. We
+                    do not track user IP addresses, install tracking cookies, or sell telemetric usage data.</p>
+                <p><strong>Data Handling:</strong> Contact form transmissions are processed solely to respond to user
+                    requests and stored on encrypted database infrastructure with strict access controls.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalTerms">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="ph ph-file-text"></i> Terms of Service</h3>
+                <button class="modal-close" id="closeTerms">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Open Intelligence:</strong> Information provided on VERO is aggregated from public feeds for
+                    research and monitoring purposes. VERO does not alter source materials.</p>
+                <p><strong>Acceptable Use:</strong> Automated scraping or denial-of-service transmissions against VERO
+                    API endpoints are strictly monitored and rate-limited.</p>
+            </div>
+        </div>
+    </div>
 
     <script src="./javascript/script.js"></script>
 </body>
