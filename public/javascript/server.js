@@ -7,6 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+// Serve static files from root directory
 app.use(express.static(path.join(__dirname, '../')));
 
 if (process.env.MONGODB_URI) {
@@ -29,13 +30,15 @@ app.get('/ping', (req, res) => {
     res.status(200).send('OK');
 });
 
+// Safe API endpoint handling empty or invalid search queries gracefully
 app.get('/api/news', async (req, res) => {
-    const query = req.query.q || 'geopolitics';
+    const rawQuery = req.query.q ? req.query.q.trim() : '';
+    const query = rawQuery !== '' ? rawQuery : 'geopolitics';
     const category = req.query.category || 'all';
     const apiKey = process.env.GNEWS_API_KEY;
 
     let searchQuery = query;
-    if (category !== 'all') {
+    if (category !== 'all' && category !== 'undefined') {
         searchQuery = `${query} ${category}`;
     }
 
@@ -48,7 +51,8 @@ app.get('/api/news', async (req, res) => {
         const response = await fetch(fetchUrl);
 
         if (!response.ok) {
-            throw new Error(`GNews API responded with status: ${response.status}`);
+            console.error(`GNews API status: ${response.status}`);
+            return res.json({ articles: [] });
         }
 
         const data = await response.json();
@@ -58,12 +62,12 @@ app.get('/api/news', async (req, res) => {
         }
 
         const formattedArticles = data.articles.map(art => ({
-            title: art.title,
-            description: art.description,
-            url: art.url,
-            image: art.image,
-            publishedAt: art.publishedAt,
-            source: art.source ? art.source.name : 'Unknown Source'
+            title: art.title || 'Untitled Report',
+            description: art.description || '',
+            url: art.url || '#',
+            image: art.image || null,
+            publishedAt: art.publishedAt || new Date().toISOString(),
+            source: art.source ? art.source.name : 'Verified Source'
         }));
 
         res.json({ articles: formattedArticles });
@@ -85,7 +89,7 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// BURASI DÜZELTİLDİ: Express'in çökmesine neden olan '*' yerine regex kullanıldı.
+// Express route fallback handling for SPA
 app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(__dirname, '../index.html'));
 });
