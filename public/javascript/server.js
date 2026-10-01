@@ -7,7 +7,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-// Serve static files from root directory
 app.use(express.static(path.join(__dirname, '../')));
 
 if (process.env.MONGODB_URI) {
@@ -30,7 +29,6 @@ app.get('/ping', (req, res) => {
     res.status(200).send('OK');
 });
 
-// Safe API endpoint handling empty or invalid search queries gracefully
 app.get('/api/news', async (req, res) => {
     const rawQuery = req.query.q ? req.query.q.trim() : '';
     const query = rawQuery !== '' ? rawQuery : 'geopolitics';
@@ -89,7 +87,6 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Express route fallback handling for SPA
 app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(__dirname, '../index.html'));
 });
