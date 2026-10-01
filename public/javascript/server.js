@@ -45,7 +45,7 @@ app.get('/api/news', async (req, res) => {
     }
 
     try {
-        const fetchUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(searchQuery)}&lang=en&max=12&apikey=${apiKey}`;
+        const fetchUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(searchQuery)}&lang=en&max=15&apikey=${apiKey}`;
         const response = await fetch(fetchUrl);
 
         if (!response.ok) {
@@ -59,14 +59,25 @@ app.get('/api/news', async (req, res) => {
             return res.json({ articles: [] });
         }
 
-        const formattedArticles = data.articles.map(art => ({
-            title: art.title || 'Untitled Report',
-            description: art.description || '',
-            url: art.url || '#',
-            image: art.image || null,
-            publishedAt: art.publishedAt || new Date().toISOString(),
-            source: art.source ? art.source.name : 'Verified Source'
-        }));
+        const seenTitles = new Set();
+        const formattedArticles = [];
+
+        for (const art of data.articles) {
+            const rawTitle = art.title || 'Untitled Report';
+            const normalizedTitle = rawTitle.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 35);
+
+            if (!seenTitles.has(normalizedTitle)) {
+                seenTitles.add(normalizedTitle);
+                formattedArticles.push({
+                    title: rawTitle,
+                    description: art.description || '',
+                    url: art.url || '#',
+                    image: art.image || null,
+                    publishedAt: art.publishedAt || new Date().toISOString(),
+                    source: art.source ? art.source.name : 'Verified Source'
+                });
+            }
+        }
 
         res.json({ articles: formattedArticles });
     } catch (err) {
