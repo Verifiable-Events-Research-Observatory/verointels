@@ -1,4 +1,3 @@
-// Theme Toggle Logic
 const themeToggleBtn = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
 
@@ -23,14 +22,15 @@ function setTheme(theme) {
     }
 }
 
-themeToggleBtn.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-});
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+}
 
 initTheme();
 
-// Navbar Scroll
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
@@ -40,7 +40,6 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Dynamic Greeting based on time
 function setGreeting() {
     const hour = new Date().getHours();
     const greetingEl = document.getElementById('greetingHeader');
@@ -58,7 +57,6 @@ function setGreeting() {
 }
 setGreeting();
 
-// Dynamic Slogan Selector
 const slogans = [
     "Unfiltered Global Signals. Zero Noise.",
     "Tactical Intelligence Before the Headlines.",
@@ -72,7 +70,6 @@ if (heroSloganEl) {
     heroSloganEl.textContent = slogans[Math.floor(Math.random() * slogans.length)];
 }
 
-// Psychological Search Placeholders
 const placeholders = [
     "Scan global defense news...",
     "Analyze economic sanctions...",
@@ -90,7 +87,6 @@ if (searchInput) {
     }, 3500);
 }
 
-// Random Suggestions Engine
 const suggestionPool = [
     "Taiwan Strait", "BRICS", "Nuclear Deterrence", "OPEC+", "NATO Expansion",
     "Sahel Juntas", "Cyber Warfare", "Red Sea Security", "UN Security Council"
@@ -100,8 +96,7 @@ function loadSuggestions() {
     const suggestEl = document.getElementById('searchSuggestions');
     if (!suggestEl) return;
 
-    // Pick 3 random
-    const shuffled = suggestionPool.sort(() => 0.5 - Math.random());
+    const shuffled = [...suggestionPool].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, 3);
 
     suggestEl.innerHTML = selected.map(term => `<button class="suggestion-pill" onclick="quickFetch('${term}')">${term}</button>`).join('');
@@ -122,18 +117,25 @@ const filterBtns = document.querySelectorAll('.filter-btn');
 
 let currentNewsData = [];
 
+const topicImageFallbacks = {
+    Military: 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&w=800&q=80',
+    Economy: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80',
+    Diplomacy: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=800&q=80',
+    GlobalIntel: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80'
+};
+
 function analyzeContentTag(title, desc) {
     const content = (title + ' ' + (desc || '')).toLowerCase();
-    if (content.match(/war|military|defense|troops|weapon|missile|navy|army|conflict|strike/)) {
-        return { name: 'Military', icon: 'ph-crosshair' };
+    if (content.match(/war|military|defense|troops|weapon|missile|navy|army|conflict|strike|fighter|artillery|drone|escalation/)) {
+        return { name: 'Military', icon: 'ph-crosshair', fallback: topicImageFallbacks.Military };
     }
-    if (content.match(/economy|market|bank|trade|inflation|sanction|currency|brics|stocks/)) {
-        return { name: 'Economy', icon: 'ph-chart-line-up' };
+    if (content.match(/economy|market|bank|trade|inflation|sanction|currency|brics|stocks|tariff|financial|oil/)) {
+        return { name: 'Economy', icon: 'ph-chart-line-up', fallback: topicImageFallbacks.Economy };
     }
-    if (content.match(/president|minister|diplomat|summit|embassy|treaty|un|council|policy/)) {
-        return { name: 'Diplomacy', icon: 'ph-handshake' };
+    if (content.match(/president|minister|diplomat|summit|embassy|treaty|un|council|policy|envoy|talks|pact/)) {
+        return { name: 'Diplomacy', icon: 'ph-handshake', fallback: topicImageFallbacks.Diplomacy };
     }
-    return { name: 'Global Intel', icon: 'ph-globe' };
+    return { name: 'Global Intel', icon: 'ph-globe', fallback: topicImageFallbacks.GlobalIntel };
 }
 
 function renderCards(data) {
@@ -154,13 +156,18 @@ function renderCards(data) {
 
         const tagData = analyzeContentTag(item.title, item.description || '');
         const formattedDate = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
-        const fallbackImg = 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+
+        let coverImg = item.image;
+        if (!coverImg || coverImg.includes('generic') || coverImg.includes('business') || coverImg.includes('placeholder')) {
+            coverImg = tagData.fallback;
+        }
+
         const cleanDesc = item.description ? (item.description.length > 120 ? item.description.substring(0, 120) + '...' : item.description) : 'Access restricted. Click to view full encrypted briefing at the source.';
 
         card.innerHTML = `
             <div class="card-banner">
                 <div class="card-tag"><i class="ph ${tagData.icon}"></i> ${tagData.name}</div>
-                <img src="${item.image || fallbackImg}" alt="Intelligence Cover" onerror="this.onerror=null;this.src='${fallbackImg}';">
+                <img src="${coverImg}" alt="Intelligence Cover" onerror="this.onerror=null;this.src='${tagData.fallback}';">
             </div>
             <div class="card-content">
                 <span class="card-date">${formattedDate}</span>
@@ -182,14 +189,16 @@ function renderCards(data) {
 }
 
 async function fetchLiveNews(query = '', category = 'all') {
+    newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); font-weight:600; padding: 60px 0;"><i class="ph ph-spinner ph-spin" style="font-size: 1.8rem; vertical-align: middle; margin-right: 8px;"></i> Fetching real-time global intelligence...</p>';
+
     const activeQuery = query.trim() !== '' ? query.trim() : getRandomDefaultTopic();
-    newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); font-weight:600; padding: 40px 0;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Fetching real-time global intelligence...</p>';
 
     try {
         const response = await fetch(`/api/news?q=${encodeURIComponent(activeQuery)}&category=${encodeURIComponent(category)}`);
         if (!response.ok) throw new Error(`Server returned status ${response.status}`);
         const data = await response.json();
         if (data.error) throw new Error(data.error);
+
         currentNewsData = data.articles || [];
         renderCards(currentNewsData);
     } catch (error) {
@@ -207,23 +216,36 @@ function quickFetch(topicQuery) {
 }
 
 let searchDebounce;
-searchInput.addEventListener('input', (e) => {
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(() => {
-        const query = e.target.value.trim();
-        const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-        fetchLiveNews(query, activeFilter);
-    }, 600);
-});
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => {
+            const query = e.target.value.trim();
+            const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+            fetchLiveNews(query, activeFilter);
+        }, 500);
+    });
 
-// Trigger button for mobile/explicit clicks
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(searchDebounce);
+            const query = searchInput.value.trim();
+            const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+            fetchLiveNews(query, activeFilter);
+            document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+}
+
 const searchTrigger = document.getElementById('searchTrigger');
 if (searchTrigger) {
     searchTrigger.addEventListener('click', () => {
-        const query = searchInput.value.trim();
+        clearTimeout(searchDebounce);
+        const query = searchInput ? searchInput.value.trim() : '';
         const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
         fetchLiveNews(query, activeFilter);
-        document.getElementById('archives').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
     });
 }
 
@@ -232,42 +254,45 @@ filterBtns.forEach(btn => {
         filterBtns.forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         const activeFilter = e.target.dataset.filter;
-        const query = searchInput.value.trim();
+        const query = searchInput ? searchInput.value.trim() : '';
         fetchLiveNews(query, activeFilter);
     });
 });
 
-document.getElementById('contactForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('.btn-submit');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Transmitting...';
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('.btn-submit');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Transmitting...';
 
-    const payload = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        topic: document.getElementById('topic').value,
-        message: document.getElementById('message').value
-    };
+        const payload = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            topic: document.getElementById('topic').value,
+            message: document.getElementById('message').value
+        };
 
-    try {
-        await fetch('/api/contact', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        btn.innerHTML = '<i class="ph ph-check-circle"></i> Securely Transmitted';
-        btn.style.background = 'var(--success)';
-        e.target.reset();
-    } catch (err) {
-        btn.innerHTML = '<i class="ph ph-warning-circle"></i> Transmission Failed';
-        btn.style.background = 'var(--danger)';
-    }
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.style.background = '';
-    }, 3000);
-});
+        try {
+            await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            btn.innerHTML = '<i class="ph ph-check-circle"></i> Securely Transmitted';
+            btn.style.background = 'var(--success)';
+            e.target.reset();
+        } catch (err) {
+            btn.innerHTML = '<i class="ph ph-warning-circle"></i> Transmission Failed';
+            btn.style.background = 'var(--danger)';
+        }
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+        }, 3000);
+    });
+}
 
 const openPrivacy = document.getElementById('openPrivacy');
 const openTerms = document.getElementById('openTerms');
