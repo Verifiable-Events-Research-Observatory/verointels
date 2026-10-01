@@ -1,4 +1,4 @@
-// Theme Toggle & Automatic Night/Day Detection Logic
+// Theme Toggle Logic
 const themeToggleBtn = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
 
@@ -8,7 +8,6 @@ function initTheme() {
         setTheme(savedTheme);
     } else {
         const currentHour = new Date().getHours();
-        // If night time (between 19:00 and 06:00), default to Dark Mode
         const isNight = currentHour >= 19 || currentHour < 6;
         setTheme(isNight ? 'dark' : 'light');
     }
@@ -31,7 +30,7 @@ themeToggleBtn.addEventListener('click', () => {
 
 initTheme();
 
-// Navbar Scroll Effect
+// Navbar Scroll
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
@@ -41,7 +40,25 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Dynamic Slogan Selector (5 Signature Slogans on Reload)
+// Dynamic Greeting based on time
+function setGreeting() {
+    const hour = new Date().getHours();
+    const greetingEl = document.getElementById('greetingHeader');
+    let text = "";
+    if (hour >= 6 && hour < 12) {
+        text = "Good Morning, Strategist.";
+    } else if (hour >= 12 && hour < 18) {
+        text = "Good Afternoon, Strategist.";
+    } else {
+        text = "Good Evening, Strategist.";
+    }
+    if (greetingEl) {
+        greetingEl.innerHTML = `<h2>${text}</h2>`;
+    }
+}
+setGreeting();
+
+// Dynamic Slogan Selector
 const slogans = [
     "Unfiltered Global Signals. Zero Noise.",
     "Tactical Intelligence Before the Headlines.",
@@ -52,18 +69,48 @@ const slogans = [
 
 const heroSloganEl = document.getElementById('heroSlogan');
 if (heroSloganEl) {
-    const randomSlogan = slogans[Math.floor(Math.random() * slogans.length)];
-    heroSloganEl.textContent = randomSlogan;
+    heroSloganEl.textContent = slogans[Math.floor(Math.random() * slogans.length)];
 }
 
-// Random Default Query Pool for Fresh Reloads without Excessive API Usage
+// Psychological Search Placeholders
+const placeholders = [
+    "Scan global defense news...",
+    "Analyze economic sanctions...",
+    "Monitor diplomatic summits...",
+    "Search conflict theaters...",
+    "Initialize tactical briefing..."
+];
+
+const searchInput = document.getElementById('searchInput');
+let pIndex = 0;
+if (searchInput) {
+    setInterval(() => {
+        pIndex = (pIndex + 1) % placeholders.length;
+        searchInput.setAttribute("placeholder", placeholders[pIndex]);
+    }, 3500);
+}
+
+// Random Suggestions Engine
+const suggestionPool = [
+    "Taiwan Strait", "BRICS", "Nuclear Deterrence", "OPEC+", "NATO Expansion",
+    "Sahel Juntas", "Cyber Warfare", "Red Sea Security", "UN Security Council"
+];
+
+function loadSuggestions() {
+    const suggestEl = document.getElementById('searchSuggestions');
+    if (!suggestEl) return;
+
+    // Pick 3 random
+    const shuffled = suggestionPool.sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 3);
+
+    suggestEl.innerHTML = selected.map(term => `<button class="suggestion-pill" onclick="quickFetch('${term}')">${term}</button>`).join('');
+}
+loadSuggestions();
+
 const defaultTopics = [
-    'geopolitics',
-    'global defense',
-    'international diplomacy',
-    'sanctions policy',
-    'global security',
-    'strategic alliance'
+    'geopolitics', 'global defense', 'international diplomacy',
+    'sanctions policy', 'global security', 'strategic alliance'
 ];
 
 function getRandomDefaultTopic() {
@@ -71,7 +118,6 @@ function getRandomDefaultTopic() {
 }
 
 const newsGrid = document.getElementById('newsGrid');
-const searchInput = document.getElementById('searchInput');
 const filterBtns = document.querySelectorAll('.filter-btn');
 
 let currentNewsData = [];
@@ -99,9 +145,7 @@ function renderCards(data) {
     }
 
     data.forEach(item => {
-        // Prevent 404 / broken link navigation issues by validating URL
         const targetUrl = (item.url && item.url.startsWith('http')) ? item.url : '#';
-
         const card = document.createElement('a');
         card.className = 'card';
         card.href = targetUrl;
@@ -111,7 +155,6 @@ function renderCards(data) {
         const tagData = analyzeContentTag(item.title, item.description || '');
         const formattedDate = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
         const fallbackImg = 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-
         const cleanDesc = item.description ? (item.description.length > 120 ? item.description.substring(0, 120) + '...' : item.description) : 'Access restricted. Click to view full encrypted briefing at the source.';
 
         card.innerHTML = `
@@ -138,23 +181,15 @@ function renderCards(data) {
     });
 }
 
-// Fetch Live News - Gracefully handles empty queries without crashing or returning 404
 async function fetchLiveNews(query = '', category = 'all') {
     const activeQuery = query.trim() !== '' ? query.trim() : getRandomDefaultTopic();
-
     newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); font-weight:600; padding: 40px 0;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Fetching real-time global intelligence...</p>';
 
     try {
         const response = await fetch(`/api/news?q=${encodeURIComponent(activeQuery)}&category=${encodeURIComponent(category)}`);
-
-        if (!response.ok) {
-            throw new Error(`Server returned status ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Server returned status ${response.status}`);
         const data = await response.json();
-
         if (data.error) throw new Error(data.error);
-
         currentNewsData = data.articles || [];
         renderCards(currentNewsData);
     } catch (error) {
@@ -163,18 +198,14 @@ async function fetchLiveNews(query = '', category = 'all') {
     }
 }
 
-// Quick Fetch trigger for Strategic Theater Buttons
 function quickFetch(topicQuery) {
     if (searchInput) searchInput.value = topicQuery;
     const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
     fetchLiveNews(topicQuery, activeFilter);
-    const intelligenceSec = document.getElementById('intelligence');
-    if (intelligenceSec) {
-        intelligenceSec.scrollIntoView({ behavior: 'smooth' });
-    }
+    const intelligenceSec = document.getElementById('archives');
+    if (intelligenceSec) intelligenceSec.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Fixed Input Event Listener (Handles deletion/empty input cleanly)
 let searchDebounce;
 searchInput.addEventListener('input', (e) => {
     clearTimeout(searchDebounce);
@@ -184,6 +215,17 @@ searchInput.addEventListener('input', (e) => {
         fetchLiveNews(query, activeFilter);
     }, 600);
 });
+
+// Trigger button for mobile/explicit clicks
+const searchTrigger = document.getElementById('searchTrigger');
+if (searchTrigger) {
+    searchTrigger.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+        fetchLiveNews(query, activeFilter);
+        document.getElementById('archives').scrollIntoView({ behavior: 'smooth' });
+    });
+}
 
 filterBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -195,7 +237,6 @@ filterBtns.forEach(btn => {
     });
 });
 
-// Contact Form Handler
 document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('.btn-submit');
@@ -222,14 +263,12 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
         btn.innerHTML = '<i class="ph ph-warning-circle"></i> Transmission Failed';
         btn.style.background = 'var(--danger)';
     }
-
     setTimeout(() => {
         btn.innerHTML = originalText;
         btn.style.background = '';
     }, 3000);
 });
 
-// Modal Controller
 const openPrivacy = document.getElementById('openPrivacy');
 const openTerms = document.getElementById('openTerms');
 const modalPrivacy = document.getElementById('modalPrivacy');
@@ -239,14 +278,11 @@ const closeTerms = document.getElementById('closeTerms');
 
 if (openPrivacy) openPrivacy.addEventListener('click', () => modalPrivacy.classList.add('active'));
 if (openTerms) openTerms.addEventListener('click', () => modalTerms.classList.add('active'));
-
 if (closePrivacy) closePrivacy.addEventListener('click', () => modalPrivacy.classList.remove('active'));
 if (closeTerms) closeTerms.addEventListener('click', () => modalTerms.classList.remove('active'));
-
 window.addEventListener('click', (e) => {
     if (e.target === modalPrivacy) modalPrivacy.classList.remove('active');
     if (e.target === modalTerms) modalTerms.classList.remove('active');
 });
 
-// Initial Load with dynamic topic
 fetchLiveNews('', 'all');
