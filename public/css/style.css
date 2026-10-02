@@ -391,6 +391,124 @@ h4 {
     background: linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.7));
 }
 
+.theater-cover::after,
+.cover-ph::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+.theater-cover {
+    background: linear-gradient(135deg, var(--c1, #1e293b), var(--c2, #0f172a));
+}
+
+.cover-icon {
+    position: absolute;
+    right: 18px;
+    bottom: 6px;
+    font-size: 6.5rem;
+    line-height: 1;
+    color: #FFFFFF;
+    opacity: 0.22;
+    z-index: 1;
+}
+
+.cv-ukraine {
+    --c1: #1d4ed8;
+    --c2: #a16207;
+}
+
+.cv-mideast {
+    --c1: #7f1d1d;
+    --c2: #0f172a;
+}
+
+.cv-taiwan {
+    --c1: #0e7490;
+    --c2: #1e1b4b;
+}
+
+.cv-brics {
+    --c1: #047857;
+    --c2: #1e293b;
+}
+
+.cv-korea {
+    --c1: #4338ca;
+    --c2: #0f172a;
+}
+
+.cv-sahel {
+    --c1: #b45309;
+    --c2: #3f1d0b;
+}
+
+.cover-ph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4.5rem;
+    color: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, var(--c1), var(--c2));
+}
+
+.cover-ph.tone-military {
+    --c1: #991b1b;
+    --c2: #0f172a;
+}
+
+.cover-ph.tone-economy {
+    --c1: #047857;
+    --c2: #0f172a;
+}
+
+.cover-ph.tone-diplomacy {
+    --c1: #1d4ed8;
+    --c2: #0f172a;
+}
+
+.cover-ph.tone-intel {
+    --c1: #475569;
+    --c2: #0f172a;
+}
+
+.banner-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.banner-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1584 / 672;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+}
+
+.top-banner {
+    margin-top: 100px;
+    animation: fadeUp 0.8s ease-out;
+}
+
+.top-banner+.hero {
+    margin-top: 0;
+}
+
+.footer-banner {
+    margin-bottom: 24px;
+}
+
 .theater-badge {
     position: absolute;
     top: 12px;
@@ -603,6 +721,9 @@ h4 {
 }
 
 .card-banner img {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -995,6 +1116,14 @@ footer {
 
     .nav-links a:not(.btn-nav) {
         display: none;
+    }
+
+    .top-banner {
+        margin-top: 76px;
+    }
+
+    .banner-wrap {
+        padding: 0 10px;
     }
 
     .hero {
