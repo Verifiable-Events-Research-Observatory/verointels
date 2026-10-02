@@ -117,25 +117,18 @@ const filterBtns = document.querySelectorAll('.filter-btn');
 
 let currentNewsData = [];
 
-const topicImageFallbacks = {
-    Military: 'https://images.unsplash.com/photo-1518281361980-b26bfd556770?auto=format&fit=crop&w=800&q=80',
-    Economy: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-    Diplomacy: 'https://images.unsplash.com/photo-1523995462485-3d171b5c8fa9?auto=format&fit=crop&w=800&q=80',
-    GlobalIntel: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=800&q=80'
-};
-
 function analyzeContentTag(title, desc) {
     const content = (title + ' ' + (desc || '')).toLowerCase();
     if (content.match(/war|military|defense|troops|weapon|missile|navy|army|conflict|strike|fighter|artillery|drone|escalation|nuclear|pentagon|nato|pla|rebel|junta|combat|tactical/)) {
-        return { name: 'Military', icon: 'ph-crosshair', fallback: topicImageFallbacks.Military };
+        return { name: 'Military', icon: 'ph-crosshair', tone: 'tone-military' };
     }
     if (content.match(/economy|market|bank|trade|inflation|sanction|currency|brics|stocks|tariff|financial|oil|gas|export|import|gdp|invest/)) {
-        return { name: 'Economy', icon: 'ph-chart-line-up', fallback: topicImageFallbacks.Economy };
+        return { name: 'Economy', icon: 'ph-chart-line-up', tone: 'tone-economy' };
     }
     if (content.match(/president|minister|diplomat|summit|embassy|treaty|un|council|policy|envoy|talks|pact|diplomacy|ambassador|geopolitics|alliance/)) {
-        return { name: 'Diplomacy', icon: 'ph-handshake', fallback: topicImageFallbacks.Diplomacy };
+        return { name: 'Diplomacy', icon: 'ph-handshake', tone: 'tone-diplomacy' };
     }
-    return { name: 'Global Intel', icon: 'ph-globe', fallback: topicImageFallbacks.GlobalIntel };
+    return { name: 'Global Intel', icon: 'ph-globe', tone: 'tone-intel' };
 }
 
 function renderCards(data) {
@@ -157,19 +150,17 @@ function renderCards(data) {
         const tagData = analyzeContentTag(item.title, item.description || '');
         const formattedDate = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
 
-        let coverImg = item.image;
+        const coverImg = item.image;
         const invalidImg = !coverImg || ['generic', 'business', 'placeholder', 'logo', 'avatar', 'default', 'icon', 'stock'].some(kw => coverImg.toLowerCase().includes(kw));
-
-        if (invalidImg) {
-            coverImg = tagData.fallback;
-        }
+        const imgTag = invalidImg ? '' : `<img src="${coverImg}" alt="Intelligence Cover" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`;
 
         const cleanDesc = item.description ? (item.description.length > 120 ? item.description.substring(0, 120) + '...' : item.description) : 'Access restricted. Click to view full encrypted briefing at the source.';
 
         card.innerHTML = `
             <div class="card-banner">
                 <div class="card-tag"><i class="ph ${tagData.icon}"></i> ${tagData.name}</div>
-                <img src="${coverImg}" alt="Intelligence Cover" onerror="this.onerror=null;this.src='${tagData.fallback}';">
+                <div class="cover-ph ${tagData.tone}"><i class="ph ${tagData.icon}"></i></div>
+                ${imgTag}
             </div>
             <div class="card-content">
                 <span class="card-date">${formattedDate}</span>
