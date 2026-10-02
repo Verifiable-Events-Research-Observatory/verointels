@@ -11,7 +11,7 @@
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/style.css?v=4">
 </head>
 
 <body>
@@ -48,11 +48,22 @@
                     <i class="ph ph-magnifying-glass search-icon"></i>
                     <input type="text" id="searchInput" placeholder="Initialize global scan..." aria-label="Search">
                     <button class="search-pulse-btn" id="searchTrigger" aria-label="Search Radar">
-                        <i class="ph ph-radar-bold"></i>
+                        <svg class="radar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" />
+                            <circle cx="12" cy="12" r="4.8" />
+                            <g class="radar-sweep">
+                                <path d="M12 12L19.8 7.5" />
+                                <path d="M12 12V3A9 9 0 0 1 19.8 7.5Z" fill="currentColor" fill-opacity="0.35"
+                                    stroke="none" />
+                            </g>
+                            <circle class="radar-blip" cx="15.8" cy="16" r="1.1" fill="currentColor" stroke="none" />
+                        </svg>
                     </button>
                 </div>
                 <div class="search-suggestions" id="searchSuggestions">
                 </div>
+                <div class="search-suggestions recent-searches" id="recentSearches"></div>
             </div>
         </div>
     </header>
@@ -236,14 +247,24 @@
                 <button class="filter-btn" data-filter="military">Military</button>
                 <button class="filter-btn" data-filter="economy">Economy</button>
             </div>
+            <div class="range-filters" id="rangeContainer">
+                <span class="range-label"><i class="ph ph-clock"></i> Timeframe</span>
+                <button class="range-btn active" data-range="all">Any time</button>
+                <button class="range-btn" data-range="24h">24h</button>
+                <button class="range-btn" data-range="7d">7 days</button>
+                <button class="range-btn" data-range="30d">30 days</button>
+            </div>
         </section>
 
         <section class="archives-header" id="archives">
             <h2>Intelligence Feed & Archives</h2>
             <p>Click on any intelligence card to access verified reporting at source.</p>
+            <p class="results-meta" id="resultsMeta"></p>
         </section>
 
         <section class="grid-container" id="newsGrid"></section>
+
+        <nav class="pagination" id="pagination" aria-label="Pagination" hidden></nav>
 
         <section class="contact-section" id="contact">
             <div class="contact-card">
@@ -356,7 +377,7 @@
         </div>
     </div>
 
-    <script src="./javascript/script.js"></script>
+    <script src="./javascript/script.js?v=4"></script>
 </body>
 
 </html>
