@@ -43,19 +43,19 @@ window.addEventListener('scroll', () => {
 function setGreeting() {
     const hour = new Date().getHours();
     const greetingEl = document.getElementById('greetingHeader');
-    let text = "";
-    if (hour >= 6 && hour < 12) {
+    if (!greetingEl) return;
+    let text;
+    if (hour >= 5 && hour < 12) {
         text = "Good Morning, Strategist.";
     } else if (hour >= 12 && hour < 18) {
         text = "Good Afternoon, Strategist.";
     } else {
         text = "Good Evening, Strategist.";
     }
-    if (greetingEl) {
-        greetingEl.innerHTML = `<h2>${text}</h2>`;
-    }
+    greetingEl.innerHTML = `<h2>${text}</h2>`;
 }
 setGreeting();
+setInterval(setGreeting, 60000);
 
 const slogans = [
     "Unfiltered Global Signals. Zero Noise.",
@@ -230,31 +230,201 @@ function renderCards(data) {
     });
 }
 
-async function fetchLiveNews(query = '', category = 'all') {
-    newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); font-weight:600; padding: 60px 0;"><i class="ph ph-spinner ph-spin" style="font-size: 1.8rem; vertical-align: middle; margin-right: 8px;"></i> Fetching real-time global intelligence...</p>';
+const PAGE_SIZE = 9;
+const state = { query: '', activeQuery: '', category: 'all', range: 'all', page: 1 };
+let requestId = 0;
 
-    const activeQuery = query.trim() !== '' ? query.trim() : getRandomDefaultTopic();
+const pagination = document.getElementById('pagination');
+const resultsMeta = document.getElementById('resultsMeta');
+const rangeBtns = document.querySelectorAll('.range-btn');
+
+function pageSequence(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages = [...new Set([1, 2, current - 1, current, current + 1, total - 1, total])]
+        .filter(p => p >= 1 && p <= total)
+        .sort((x, y) => x - y);
+    const out = [];
+    pages.forEach((p, i) => {
+        if (i > 0 && p - pages[i - 1] > 1) out.push('gap');
+        out.push(p);
+    });
+    return out;
+}
+
+function renderPagination(page, totalPages) {
+    if (!pagination) return;
+    if (totalPages <= 1) {
+        pagination.hidden = true;
+        pagination.innerHTML = '';
+        return;
+    }
+    const numbers = pageSequence(page, totalPages).map(p => p === 'gap'
+        ? '<span class="page-gap">&hellip;</span>'
+        : `<button type="button" class="page-num${p === page ? ' active' : ''}" data-page="${p}" ${p === page ? 'aria-current="page"' : ''}>${p}</button>`
+    ).join('');
+
+    pagination.innerHTML = `
+        <button type="button" class="page-arrow" data-page="${page - 1}" aria-label="Previous page" ${page <= 1 ? 'disabled' : ''}><i class="ph ph-caret-left"></i></button>
+        <div class="page-center">
+            <div class="page-numbers">${numbers}</div>
+            <label class="page-jump">Go to
+                <input type="text" id="pageJump" inputmode="numeric" maxlength="3" placeholder="${page}" aria-label="Go to page" autocomplete="off">
+                <span>/ ${totalPages}</span>
+            </label>
+        </div>
+        <button type="button" class="page-arrow" data-page="${page + 1}" aria-label="Next page" ${page >= totalPages ? 'disabled' : ''}><i class="ph ph-caret-right"></i></button>
+    `;
+    pagination.hidden = false;
+    pagination.dataset.total = totalPages;
+}
+
+if (pagination) {
+    pagination.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-page]');
+        if (!btn || btn.disabled) return;
+        goToPage(parseInt(btn.dataset.page, 10));
+    });
+
+    pagination.addEventListener('input', (e) => {
+        if (e.target.id === 'pageJump') e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3);
+    });
+
+    pagination.addEventListener('keydown', (e) => {
+        if (e.target.id !== 'pageJump' || e.key !== 'Enter') return;
+        e.preventDefault();
+        const total = parseInt(pagination.dataset.total, 10) || 1;
+        const value = parseInt(e.target.value, 10);
+        if (!value) return;
+        goToPage(Math.min(Math.max(value, 1), total));
+    });
+}
+
+function goToPage(page) {
+    if (!page || page === state.page) return;
+    fetchLiveNews(state.query, state.category, page, true);
+}
+
+function updateMeta(data) {
+    if (!resultsMeta) return;
+    if (!data.total) {
+        resultsMeta.textContent = '';
+        return;
+    }
+    const start = (data.page - 1) * PAGE_SIZE + 1;
+    const end = Math.min(data.page * PAGE_SIZE, data.total);
+    resultsMeta.textContent = `Showing ${start}\u2013${end} of ${data.total} reports`;
+}
+
+async function fetchLiveNews(query = '', category = 'all', page = 1, scrollToFeed = false) {
+    const id = ++requestId;
+    state.query = query;
+    state.category = category;
+    if (page === 1) state.activeQuery = query.trim() !== '' ? query.trim() : getRandomDefaultTopic();
+
+    newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); font-weight:600; padding: 60px 0;"><i class="ph ph-spinner ph-spin" style="font-size: 1.8rem; vertical-align: middle; margin-right: 8px;"></i> Fetching real-time global intelligence...</p>';
+    if (pagination) pagination.hidden = true;
+    if (scrollToFeed) document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
 
     try {
-        const response = await fetch(`/api/news?q=${encodeURIComponent(activeQuery)}&category=${encodeURIComponent(category)}`);
+        const params = new URLSearchParams({
+            q: state.activeQuery,
+            category,
+            range: state.range,
+            page,
+            size: PAGE_SIZE
+        });
+        const response = await fetch(`/api/news?${params}`);
         if (!response.ok) throw new Error(`Server returned status ${response.status}`);
         const data = await response.json();
         if (data.error) throw new Error(data.error);
+        if (id !== requestId) return;
 
+        state.page = data.page || 1;
         currentNewsData = data.articles || [];
         renderCards(currentNewsData);
+        renderPagination(state.page, data.totalPages || 1);
+        updateMeta(data);
     } catch (error) {
+        if (id !== requestId) return;
         console.error("Fetch error:", error);
+        if (resultsMeta) resultsMeta.textContent = '';
         newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color: var(--danger); font-weight:600; padding: 40px 0;">Transmission standby. Verify connection or query parameters.</p>';
     }
 }
 
+const RECENT_KEY = 'vero_recent';
+
+function getRecent() {
+    try {
+        return JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+    } catch (err) {
+        return [];
+    }
+}
+
+function renderRecent() {
+    const el = document.getElementById('recentSearches');
+    if (!el) return;
+    el.innerHTML = '';
+    const list = getRecent();
+    if (!list.length) return;
+
+    const label = document.createElement('span');
+    label.className = 'recent-label';
+    label.textContent = 'Recent';
+    el.appendChild(label);
+
+    list.forEach(term => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'suggestion-pill recent-pill';
+        b.textContent = term;
+        b.addEventListener('click', () => quickFetch(term));
+        el.appendChild(b);
+    });
+
+    const clear = document.createElement('button');
+    clear.type = 'button';
+    clear.className = 'recent-clear';
+    clear.setAttribute('aria-label', 'Clear recent searches');
+    clear.innerHTML = '&times;';
+    clear.addEventListener('click', () => {
+        localStorage.removeItem(RECENT_KEY);
+        renderRecent();
+    });
+    el.appendChild(clear);
+}
+
+function saveRecent(term) {
+    const clean = (term || '').trim();
+    if (!clean) return;
+    const list = [clean, ...getRecent().filter(t => t.toLowerCase() !== clean.toLowerCase())].slice(0, 5);
+    try {
+        localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+    } catch (err) {
+        return;
+    }
+    renderRecent();
+}
+renderRecent();
+
+function currentCategory() {
+    return document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+}
+
 function quickFetch(topicQuery) {
     if (searchInput) searchInput.value = topicQuery;
-    const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-    fetchLiveNews(topicQuery, activeFilter);
-    const intelligenceSec = document.getElementById('archives');
-    if (intelligenceSec) intelligenceSec.scrollIntoView({ behavior: 'smooth' });
+    saveRecent(topicQuery);
+    fetchLiveNews(topicQuery, currentCategory());
+    document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function runSearch() {
+    clearTimeout(searchDebounce);
+    const query = searchInput ? searchInput.value.trim() : '';
+    saveRecent(query);
+    fetchLiveNews(query, currentCategory());
+    document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
 }
 
 let searchDebounce;
@@ -262,42 +432,45 @@ if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         clearTimeout(searchDebounce);
         searchDebounce = setTimeout(() => {
-            const query = e.target.value.trim();
-            const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-            fetchLiveNews(query, activeFilter);
+            fetchLiveNews(e.target.value.trim(), currentCategory());
         }, 500);
     });
 
     searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            clearTimeout(searchDebounce);
-            const query = searchInput.value.trim();
-            const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-            fetchLiveNews(query, activeFilter);
-            document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
+            runSearch();
+        } else if (e.key === 'Escape') {
+            searchInput.blur();
         }
     });
 }
 
+document.addEventListener('keydown', (e) => {
+    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    searchInput?.focus();
+});
+
 const searchTrigger = document.getElementById('searchTrigger');
-if (searchTrigger) {
-    searchTrigger.addEventListener('click', () => {
-        clearTimeout(searchDebounce);
-        const query = searchInput ? searchInput.value.trim() : '';
-        const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
-        fetchLiveNews(query, activeFilter);
-        document.getElementById('archives')?.scrollIntoView({ behavior: 'smooth' });
-    });
-}
+if (searchTrigger) searchTrigger.addEventListener('click', runSearch);
 
 filterBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
         filterBtns.forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        const activeFilter = e.target.dataset.filter;
-        const query = searchInput ? searchInput.value.trim() : '';
-        fetchLiveNews(query, activeFilter);
+        e.currentTarget.classList.add('active');
+        fetchLiveNews(searchInput ? searchInput.value.trim() : '', e.currentTarget.dataset.filter);
+    });
+});
+
+rangeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        rangeBtns.forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        state.range = e.currentTarget.dataset.range;
+        fetchLiveNews(searchInput ? searchInput.value.trim() : '', currentCategory());
     });
 });
 
