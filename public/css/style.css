@@ -377,10 +377,11 @@ h4 {
 }
 
 .theater-cover {
-    height: 160px;
+    height: 170px;
+    position: relative;
+    background-color: #0f172a;
     background-size: cover;
     background-position: center;
-    position: relative;
     border-bottom: 1px solid var(--border);
 }
 
@@ -388,95 +389,37 @@ h4 {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.7));
-}
-
-.theater-cover::after,
-.cover-ph::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-    background-size: 28px 28px;
-}
-
-.theater-cover {
-    background: linear-gradient(135deg, var(--c1, #1e293b), var(--c2, #0f172a));
-}
-
-.cover-icon {
-    position: absolute;
-    right: 18px;
-    bottom: 6px;
-    font-size: 6.5rem;
-    line-height: 1;
-    color: #FFFFFF;
-    opacity: 0.22;
-    z-index: 1;
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.35), transparent 40%, rgba(15, 23, 42, 0.55));
 }
 
 .cv-ukraine {
-    --c1: #1d4ed8;
-    --c2: #a16207;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/M777_in_Ukraine_MMXXII.jpg/1280px-M777_in_Ukraine_MMXXII.jpg'), linear-gradient(135deg, #1e293b, #0f172a);
+    background-position: center 55%;
 }
 
 .cv-mideast {
-    --c1: #7f1d1d;
-    --c2: #0f172a;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/USS_Gerald_R._Ford_%28CVN-78%29_underway_on_8_April_2017.JPG/1280px-USS_Gerald_R._Ford_%28CVN-78%29_underway_on_8_April_2017.JPG'), linear-gradient(135deg, #1e293b, #0f172a);
+    background-position: center 50%;
 }
 
 .cv-taiwan {
-    --c1: #0e7490;
-    --c2: #1e1b4b;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Taipei_Landscape.jpg/1280px-Taipei_Landscape.jpg'), linear-gradient(135deg, #1e293b, #0f172a);
+    background-position: center 60%;
 }
 
 .cv-brics {
-    --c1: #047857;
-    --c2: #1e293b;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Pudong_Shanghai_November_2017_panorama.jpg/1280px-Pudong_Shanghai_November_2017_panorama.jpg'), linear-gradient(135deg, #1e293b, #0f172a);
+    background-position: center 55%;
 }
 
 .cv-korea {
-    --c1: #4338ca;
-    --c2: #0f172a;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/070401_Panmunjeom3.jpg/1280px-070401_Panmunjeom3.jpg'), linear-gradient(135deg, #1e293b, #0f172a);
+    background-position: center 40%;
 }
 
 .cv-sahel {
-    --c1: #b45309;
-    --c2: #3f1d0b;
-}
-
-.cover-ph {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4.5rem;
-    color: rgba(255, 255, 255, 0.3);
-    background: linear-gradient(135deg, var(--c1), var(--c2));
-}
-
-.cover-ph.tone-military {
-    --c1: #991b1b;
-    --c2: #0f172a;
-}
-
-.cover-ph.tone-economy {
-    --c1: #047857;
-    --c2: #0f172a;
-}
-
-.cover-ph.tone-diplomacy {
-    --c1: #1d4ed8;
-    --c2: #0f172a;
-}
-
-.cover-ph.tone-intel {
-    --c1: #475569;
-    --c2: #0f172a;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Between_Mopti_and_Timbuktu_%286865110%29.jpg/1280px-Between_Mopti_and_Timbuktu_%286865110%29.jpg'), linear-gradient(135deg, #1e293b, #0f172a);
+    background-position: center 55%;
 }
 
 .banner-wrap {
@@ -717,7 +660,12 @@ h4 {
     height: 180px;
     position: relative;
     overflow: hidden;
-    background: #0F172A;
+    background: linear-gradient(110deg, #0f172a 30%, #1e293b 50%, #0f172a 70%);
+    background-size: 200% 100%;
+}
+
+.card-banner.loading {
+    animation: shimmer 1.4s linear infinite;
 }
 
 .card-banner img {
@@ -727,11 +675,26 @@ h4 {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s;
+    opacity: 0;
+    transition: opacity 0.35s, transform 0.5s;
+}
+
+.card-banner img.ready {
+    opacity: 1;
 }
 
 .card:hover .card-banner img {
     transform: scale(1.05);
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 200% 0;
+    }
+
+    to {
+        background-position: -200% 0;
+    }
 }
 
 .card-tag {
