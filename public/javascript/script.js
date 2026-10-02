@@ -117,18 +117,68 @@ const filterBtns = document.querySelectorAll('.filter-btn');
 
 let currentNewsData = [];
 
+const WM = 'https://upload.wikimedia.org/wikipedia/commons/thumb/';
+const coverFallbacks = {
+    military: WM + 'b/b2/USS_Gerald_R._Ford_%28CVN-78%29_underway_on_8_April_2017.JPG/960px-USS_Gerald_R._Ford_%28CVN-78%29_underway_on_8_April_2017.JPG',
+    economy: WM + 'd/df/Pudong_Shanghai_November_2017_panorama.jpg/960px-Pudong_Shanghai_November_2017_panorama.jpg',
+    diplomacy: WM + 'e/ea/070401_Panmunjeom3.jpg/960px-070401_Panmunjeom3.jpg',
+    intel: WM + 'b/bc/Taipei_Landscape.jpg/960px-Taipei_Landscape.jpg'
+};
+
 function analyzeContentTag(title, desc) {
     const content = (title + ' ' + (desc || '')).toLowerCase();
     if (content.match(/war|military|defense|troops|weapon|missile|navy|army|conflict|strike|fighter|artillery|drone|escalation|nuclear|pentagon|nato|pla|rebel|junta|combat|tactical/)) {
-        return { name: 'Military', icon: 'ph-crosshair', tone: 'tone-military' };
+        return { name: 'Military', icon: 'ph-crosshair', key: 'military' };
     }
     if (content.match(/economy|market|bank|trade|inflation|sanction|currency|brics|stocks|tariff|financial|oil|gas|export|import|gdp|invest/)) {
-        return { name: 'Economy', icon: 'ph-chart-line-up', tone: 'tone-economy' };
+        return { name: 'Economy', icon: 'ph-chart-line-up', key: 'economy' };
     }
     if (content.match(/president|minister|diplomat|summit|embassy|treaty|un|council|policy|envoy|talks|pact|diplomacy|ambassador|geopolitics|alliance/)) {
-        return { name: 'Diplomacy', icon: 'ph-handshake', tone: 'tone-diplomacy' };
+        return { name: 'Diplomacy', icon: 'ph-handshake', key: 'diplomacy' };
     }
-    return { name: 'Global Intel', icon: 'ph-globe', tone: 'tone-intel' };
+    return { name: 'Global Intel', icon: 'ph-globe', key: 'intel' };
+}
+
+function proxiedImage(url) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=720&h=400&fit=cover&a=attention&output=webp&q=78`;
+}
+
+function attachCover(banner, sources, index) {
+    const img = new Image();
+    img.alt = 'Intelligence Cover';
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    img.loading = index < 6 ? 'eager' : 'lazy';
+    if (index < 3) img.fetchPriority = 'high';
+
+    let step = 0;
+    let timer;
+
+    const advance = () => {
+        clearTimeout(timer);
+        step++;
+        if (step < sources.length) {
+            load();
+        } else {
+            img.remove();
+            banner.classList.remove('loading');
+        }
+    };
+
+    const load = () => {
+        img.src = sources[step];
+        if (step < sources.length - 1) timer = setTimeout(advance, 4500);
+    };
+
+    img.onload = () => {
+        clearTimeout(timer);
+        img.classList.add('ready');
+        banner.classList.remove('loading');
+    };
+    img.onerror = advance;
+
+    banner.appendChild(img);
+    load();
 }
 
 function renderCards(data) {
@@ -139,7 +189,7 @@ function renderCards(data) {
         return;
     }
 
-    data.forEach(item => {
+    data.forEach((item, index) => {
         const targetUrl = (item.url && item.url.startsWith('http')) ? item.url : '#';
         const card = document.createElement('a');
         card.className = 'card';
@@ -151,16 +201,14 @@ function renderCards(data) {
         const formattedDate = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent';
 
         const coverImg = item.image;
-        const invalidImg = !coverImg || ['generic', 'business', 'placeholder', 'logo', 'avatar', 'default', 'icon', 'stock'].some(kw => coverImg.toLowerCase().includes(kw));
-        const imgTag = invalidImg ? '' : `<img src="${coverImg}" alt="Intelligence Cover" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`;
+        const invalidImg = !coverImg || !coverImg.startsWith('http') || ['generic', 'business', 'placeholder', 'logo', 'avatar', 'default', 'icon', 'stock'].some(kw => coverImg.toLowerCase().includes(kw));
+        const sources = invalidImg ? [coverFallbacks[tagData.key]] : [proxiedImage(coverImg), coverImg, coverFallbacks[tagData.key]];
 
         const cleanDesc = item.description ? (item.description.length > 120 ? item.description.substring(0, 120) + '...' : item.description) : 'Access restricted. Click to view full encrypted briefing at the source.';
 
         card.innerHTML = `
-            <div class="card-banner">
+            <div class="card-banner loading">
                 <div class="card-tag"><i class="ph ${tagData.icon}"></i> ${tagData.name}</div>
-                <div class="cover-ph ${tagData.tone}"><i class="ph ${tagData.icon}"></i></div>
-                ${imgTag}
             </div>
             <div class="card-content">
                 <span class="card-date">${formattedDate}</span>
@@ -177,6 +225,7 @@ function renderCards(data) {
                 </div>
             </div>
         `;
+        attachCover(card.querySelector('.card-banner'), sources, index);
         newsGrid.appendChild(card);
     });
 }
