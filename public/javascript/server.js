@@ -64,10 +64,92 @@ function scoreArticle(art, terms) {
     return { matched, score };
 }
 
+const MAX_SOURCE_PAGES = 5;
+const CACHE_TTL = 10 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 60;
+const RANGE_HOURS = { '24h': 24, '7d': 168, '30d': 720 };
+const newsCache = new Map();
+
+async function fetchGNewsPage(searchQuery, page, from, apiKey) {
+    let url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(searchQuery)}&lang=en&max=15&in=title,description&apikey=${apiKey}`;
+    if (page > 1) url += `&page=${page}`;
+    if (from) url += `&from=${encodeURIComponent(from)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        console.error(`GNews API status: ${response.status}`);
+        return null;
+    }
+    const data = await response.json();
+    return data && Array.isArray(data.articles) ? data : null;
+}
+
+function rankArticles(rawArticles, queryTerms) {
+    const seenTitles = new Set();
+    const seenImages = new Set();
+    const candidates = [];
+
+    for (const art of rawArticles) {
+        const rawTitle = art.title || 'Untitled Report';
+        const normalizedTitle = rawTitle.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 35);
+        if (seenTitles.has(normalizedTitle)) continue;
+        seenTitles.add(normalizedTitle);
+
+        let image = art.image && /^https?:\/\//.test(art.image) ? art.image : null;
+        if (image && seenImages.has(image)) image = null;
+        if (image) seenImages.add(image);
+
+        const article = {
+            title: rawTitle,
+            description: art.description || '',
+            url: art.url || '#',
+            image,
+            publishedAt: art.publishedAt || new Date().toISOString(),
+            source: art.source ? art.source.name : 'Verified Source'
+        };
+        candidates.push({ article, ...scoreArticle(article, queryTerms) });
+    }
+
+    const needed = Math.min(2, queryTerms.length);
+    let ranked = candidates.filter(c => c.matched >= needed);
+    if (ranked.length < 3) ranked = candidates.filter(c => c.matched >= 1);
+    if (ranked.length === 0) ranked = candidates;
+
+    ranked.sort((x, y) => y.score - x.score || new Date(y.article.publishedAt) - new Date(x.article.publishedAt));
+    return ranked.map(c => c.article);
+}
+
+async function getRankedArticles(searchQuery, queryTerms, range, apiKey) {
+    const cacheKey = `${searchQuery}|${range}`;
+    const cached = newsCache.get(cacheKey);
+    if (cached && cached.expires > Date.now()) return cached.articles;
+
+    const hours = RANGE_HOURS[range];
+    const from = hours ? new Date(Math.floor((Date.now() - hours * 3600000) / 3600000) * 3600000).toISOString() : null;
+
+    const first = await fetchGNewsPage(searchQuery, 1, from, apiKey);
+    if (!first) return null;
+
+    const collected = [...first.articles];
+    const total = first.totalArticles || collected.length;
+    for (let p = 2; p <= MAX_SOURCE_PAGES && collected.length < total; p++) {
+        const next = await fetchGNewsPage(searchQuery, p, from, apiKey);
+        if (!next || next.articles.length === 0) break;
+        collected.push(...next.articles);
+    }
+
+    const articles = rankArticles(collected, queryTerms);
+    if (newsCache.size >= MAX_CACHE_ENTRIES) newsCache.delete(newsCache.keys().next().value);
+    newsCache.set(cacheKey, { articles, expires: Date.now() + CACHE_TTL });
+    return articles;
+}
+
 app.get('/api/news', async (req, res) => {
     const rawQuery = req.query.q ? req.query.q.trim() : '';
     const query = rawQuery !== '' ? rawQuery : 'geopolitics';
     const category = (req.query.category || 'all').toLowerCase();
+    const range = RANGE_HOURS[req.query.range] ? req.query.range : 'all';
+    const size = Math.min(Math.max(parseInt(req.query.size, 10) || 9, 1), 30);
+    const requestedPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
     const apiKey = process.env.GNEWS_API_KEY;
 
     if (!apiKey) {
@@ -82,53 +164,17 @@ app.get('/api/news', async (req, res) => {
     }
 
     try {
-        const fetchUrl = `https://gnews.io/api/v4/search?q=${encodeURIComponent(searchQuery)}&lang=en&max=15&in=title,description&apikey=${apiKey}`;
-        const response = await fetch(fetchUrl);
+        const ranked = await getRankedArticles(searchQuery, queryTerms, range, apiKey);
+        if (!ranked) return res.json({ articles: [], page: 1, totalPages: 1, total: 0 });
 
-        if (!response.ok) {
-            console.error(`GNews API status: ${response.status}`);
-            return res.json({ articles: [] });
-        }
-
-        const data = await response.json();
-
-        if (!data.articles) {
-            return res.json({ articles: [] });
-        }
-
-        const seenTitles = new Set();
-        const seenImages = new Set();
-        const candidates = [];
-
-        for (const art of data.articles) {
-            const rawTitle = art.title || 'Untitled Report';
-            const normalizedTitle = rawTitle.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 35);
-            if (seenTitles.has(normalizedTitle)) continue;
-            seenTitles.add(normalizedTitle);
-
-            let image = art.image && /^https?:\/\//.test(art.image) ? art.image : null;
-            if (image && seenImages.has(image)) image = null;
-            if (image) seenImages.add(image);
-
-            const article = {
-                title: rawTitle,
-                description: art.description || '',
-                url: art.url || '#',
-                image,
-                publishedAt: art.publishedAt || new Date().toISOString(),
-                source: art.source ? art.source.name : 'Verified Source'
-            };
-            candidates.push({ article, ...scoreArticle(article, queryTerms) });
-        }
-
-        const needed = Math.min(2, queryTerms.length);
-        let ranked = candidates.filter(c => c.matched >= needed);
-        if (ranked.length < 3) ranked = candidates.filter(c => c.matched >= 1);
-        if (ranked.length === 0) ranked = candidates;
-
-        ranked.sort((x, y) => y.score - x.score || new Date(y.article.publishedAt) - new Date(x.article.publishedAt));
-
-        res.json({ articles: ranked.map(c => c.article) });
+        const totalPages = Math.max(1, Math.ceil(ranked.length / size));
+        const page = Math.min(requestedPage, totalPages);
+        res.json({
+            articles: ranked.slice((page - 1) * size, page * size),
+            page,
+            totalPages,
+            total: ranked.length
+        });
     } catch (err) {
         console.error("GNews Fetch Error:", err);
         res.status(500).json({ error: "Failed to fetch live intelligence data" });
